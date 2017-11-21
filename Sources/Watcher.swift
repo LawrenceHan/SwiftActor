@@ -14,8 +14,8 @@ public protocol Watcher: class {
     var handler: Handler? { get }
     
     func reportedProgress(_ path: String, progress: CGFloat)
-    func resourceDispatched(_ path: String, resource: Any?, arg: Any?)
-    func complete(_ path: String, result: Result<Any, ActorError>)
+    func resourceDispatched(_ path: String, resource: Any, arg: Any?)
+    func completed(_ path: String, result: Result<Any, ActorError>)
     func requested(_ action: String, options: [AnyHashable: Any]?)
     
     func watcherMessageReceived(_ path: String, messageType: String?, message: Any?)

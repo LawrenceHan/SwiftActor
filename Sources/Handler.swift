@@ -24,10 +24,10 @@ public class Handler {
             os_unfair_lock_unlock(&lock)
         }
     }
+    public let releaseOnMainQueue: Bool
     
     private var lock: os_unfair_lock = os_unfair_lock()
     private weak var _delegate: Watcher?
-    private let releaseOnMainQueue: Bool
     
     public init(_ delegate: Watcher, releaseOnMainQueue: Bool = false) {
         self._delegate = delegate
