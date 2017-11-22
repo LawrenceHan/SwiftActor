@@ -44,7 +44,7 @@ public extension Handler {
         os_unfair_lock_unlock(&lock)
     }
     
-    public func send(_ action: String, options: [AnyHashable: Any]? = nil) {
+    public func send(_ action: String, options: [String: Any]? = nil) {
         _delegate?.requested(action, options: options)
         if releaseOnMainQueue && !Thread.isMainThread {
             DispatchQueue.main.async {
@@ -71,7 +71,7 @@ public extension Handler {
         }
     }
     
-    public func sendResource(_ path: String, resource: Any? = nil, arg: Any? = nil) {
+    public func sendResource(_ path: String, resource: Any, arg: Any? = nil) {
         _delegate?.resourceDispatched(path, resource: resource, arg: arg)
         if releaseOnMainQueue && !Thread.isMainThread {
             DispatchQueue.main.async {

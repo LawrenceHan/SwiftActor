@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreGraphics
 import Result
 
 public final class Dispatcher {
@@ -47,7 +48,7 @@ public final class Dispatcher {
     
     private var removeWatcherRequests: [Handler] = []
     private var removeWatcherFromPathRequests: [RemoveWatcherInfo] = []
-    private var requestsQueue: [String: [SwiftActor]] = [:]
+    private var requestQueues: [String: [SwiftActor]] = [:]
     private var activeRequests: [String: RequestInfo] = [:]
     private var liveWatchers: [String: [Handler]] = [:]
     
@@ -74,13 +75,8 @@ public final class Dispatcher {
 // MARK: - registration
 
 public extension Dispatcher {
-    public func registerActor(_ actor: SwiftActor.Type) {
+    public func register(_ actor: SwiftActor.Type) {
         registeredActors[actor.genericPath] = actor
-    }
-    
-    public func requestActor(_ genericPath: String, path: String) -> SwiftActor? {
-        guard let actorType = registeredActors[genericPath] else { return nil }
-        return actorType.init(path: genericPath)
     }
 }
 
@@ -167,7 +163,7 @@ public extension Dispatcher {
                     self.activeRequests[path] = requestInfo
                     
                     if requestInfo.watchers.isEmpty {
-                        //                        self.scheduleCancelRequest(path: path)
+                        self.cancelRequest(path)
                     }
                 }
                 
@@ -243,7 +239,7 @@ public extension Dispatcher {
                     self.activeRequests[path] = requestInfo
                     
                     if requestInfo.watchers.isEmpty {
-//                        self.scheduleCancelRequest(path: path)
+                        self.cancelRequest(path)
                     }
                 }
                 
@@ -270,7 +266,7 @@ public extension Dispatcher {
             
             requestInfo.watchers.removeAll()
             self.activeRequests[path] = requestInfo
-//            self.scheduleCancelRequest(path: path)
+            self.cancelRequest(path)
         }
         
         dispatch(workItem, queue: highPriorityQueue)
@@ -285,7 +281,7 @@ public extension Dispatcher {
         }
     }
     
-    public func dispatch<Resource>(_ path: String, resource: Result<Resource, ActorError>, arg: Any? = nil) {
+    public func dispatch(_ path: String, resource: Any, arg: Any? = nil) {
         let workItem = DispatchWorkItem { [unowned self] in
             let genericPath = self.genericPath(with: path)
             
@@ -321,6 +317,28 @@ public extension Dispatcher {
         dispatch(workItem)
     }
     
+    public func dispatchProgress(_ path: String, progress: CGFloat) {
+        let workItem = DispatchWorkItem { [unowned self] in
+            guard let requestInfo = self.activeRequests[path] else {
+                return
+            }
+            
+            for handler in requestInfo.watchers {
+                var watcher = handler.delegate
+                watcher?.reportedProgress(path, progress: progress)
+                
+                if handler.releaseOnMainQueue {
+                    DispatchQueue.main.async {
+                        _ = watcher.self
+                    }
+                }
+                watcher = nil
+            }
+        }
+        
+        dispatch(workItem)
+    }
+    
     public func dispatchMessage(watcher path: String, messageType: String? = nil, message: Any? = nil) {
         let workItem = DispatchWorkItem { [unowned self] in
             let genericPath = self.genericPath(with: path)
@@ -343,7 +361,21 @@ public extension Dispatcher {
         dispatch(workItem)
     }
     
-    public func completed(_ path: String, result: Result<Any, ActorError>) {
+    public func dispatchActorMessage(watcher path: String, messageType: String? = nil, message: Any? = nil) {
+        let workItem = DispatchWorkItem {
+            guard let requestInfo = self.activeRequests[path] else {
+                return
+            }
+            
+            for handler in requestInfo.watchers {
+                handler.sendActorMessage(path, messageType: messageType, message: message)
+            }
+        }
+        
+        dispatch(workItem)
+    }
+    
+    public func completed(_ path: String, result: Result) {
         let workItem = DispatchWorkItem { [unowned self] in
             guard let requestInfo = self.activeRequests[path] else {
                 return
@@ -370,24 +402,14 @@ public extension Dispatcher {
                 return
             }
             
-//            self.removeRequestFromQueueAndProceedIfFirst(
-//                name: requestQueueName, fromRequestActor: requestActor
-//            )
+            self.removeRequestAndExecuteNextIn(requestQueueName, requestActor: requestInfo.requestActor)
         }
         
         dispatch(workItem)
     }
     
-    public func request(_ path: String, options: [AnyHashable: Any]? = nil, watcher: Watcher) {
-//        _requestGeneric(
-//            joinOnly: false,
-//            inCurrentQueue: false,
-//            path: path, options:
-//            options,
-//            flags: flags,
-//            watcher: watcher,
-//            completion: completion
-//        )
+    public func request(_ path: String, options: [String: Any]? = nil, watcher: Watcher) {
+        request(joinOnly: false, inCurrentQueue: false, path: path, options: options, watcher: watcher)
     }
     
     
@@ -395,7 +417,7 @@ public extension Dispatcher {
 
 // MARK: - helper
 
-extension Dispatcher {
+public extension Dispatcher {
     public func rejoin(_ genericPath: String, prefix: String, watcher: Watcher) -> [String] {
         var rejoinPaths: [String] = []
         for path in activeRequests.keys {
@@ -407,7 +429,7 @@ extension Dispatcher {
         }
         
         for path in rejoinPaths {
-            //            _requestGeneric(joinOnly: true, inCurrentQueue: true, path: path, options: [:], flags: 0, watcher: watcher, completion: nil)
+            request(joinOnly: true, inCurrentQueue: true, path: path, options: [:], watcher: watcher)
         }
         
         return rejoinPaths
@@ -482,11 +504,36 @@ extension Dispatcher {
         
         return requestInfo.requestActor
     }
+    
+    public func dumpActorState() {
+        let workItem = DispatchWorkItem { [unowned self] in
+            print("===== Actor State =====")
+            
+            print("\(self.liveWatchers.count) live watchers")
+            for (path, watchers) in self.liveWatchers {
+                print("    \(path)")
+                for handler in watchers {
+                    if let watcher = handler.delegate {
+                        print("        \(watcher)")
+                    }
+                }
+            }
+            
+            print("\(self.activeRequests.count) requests")
+            for (path, _) in self.activeRequests {
+                print("    \(path)")
+            }
+            
+            print("=======================")
+        }
+        
+        dispatch(workItem)
+    }
 }
 
 // MARK: - internal
 
-extension Dispatcher {
+private extension Dispatcher {
     func genericPath(with path: String) -> String {
         if path.isEmpty {
             return ""
@@ -513,6 +560,153 @@ extension Dispatcher {
         }
         
         return newPath
+    }
+    
+    func request(
+        joinOnly: Bool,
+        inCurrentQueue: Bool,
+        path: String,
+        options: [String: Any]?,
+        watcher: Watcher) {
+        guard let handler = watcher.handler else {
+            print("===== warning: handler is nil")
+            return
+        }
+        
+        let workItem = DispatchWorkItem { [unowned self] in
+            if handler.delegate == nil {
+                print("===== error: handler.delegate is nil")
+                return
+            }
+            
+            let genericPath = self.genericPath(with: path)
+            var requestInfo: RequestInfo? = self.activeRequests[path]
+            
+            if joinOnly && requestInfo == nil { return }
+            
+            if requestInfo == nil {
+                guard let actor = self.actor(genericPath, path: path) else {
+                    print("===== error: actor not found for \"\(path)\"")
+                    return
+                }
+                
+                let watchers = [handler]
+                requestInfo = (actor, watchers)
+                self.activeRequests[path] = requestInfo
+                
+                actor.prepare(options: options)
+                
+                var executeNow = true
+                if let requestQueueName = actor.requestQueueName {
+                    var requestQueue = self.requestQueues[requestQueueName]
+                    if requestQueue == nil {
+                        requestQueue = [actor]
+                    } else {
+                        requestQueue!.append(actor)
+                        if requestQueue!.count > 1 {
+                            executeNow = false
+                            print("===== adding request \(actor) to request queue \"\(requestQueueName)\"")
+                        }
+                    }
+                    self.requestQueues[requestQueueName] = requestQueue
+                }
+                
+                if executeNow {
+                    actor.execute(options: options)
+                } else {
+                    actor.storedOptions = options
+                }
+            } else {
+                if requestInfo!.watchers.contains(object: handler) {
+                    print("===== joining watcher to the wathcers of \"\(path)\"")
+                    requestInfo!.watchers.append(handler)
+                    self.activeRequests[path] = requestInfo!
+                } else {
+                    print("===== continue to watch for actor \"\(path)\"")
+                }
+                
+                if requestInfo!.requestActor.requestQueueName == nil {
+                    requestInfo!.requestActor.watcherJoined(handler, options: options, waitingInActorQueue: false)
+                } else {
+                    let requestQueue = self.requestQueues[requestInfo!.requestActor.requestQueueName!]
+                    if  requestQueue == nil || requestQueue?.count == 0 {
+                        requestInfo!.requestActor.watcherJoined(handler, options: options, waitingInActorQueue: false)
+                    } else {
+                        let wait = (requestQueue?[0] !== requestInfo!.requestActor)
+                        requestInfo!.requestActor.watcherJoined(handler, options: options, waitingInActorQueue: wait)
+                    }
+                }
+            }
+        }
+        
+        if inCurrentQueue {
+            workItem.perform()
+        } else {
+            dispatch(workItem)
+        }
+    }
+    
+    func removeRequestAndExecuteNextIn(_ queueName: String, requestActor: SwiftActor) {
+        var requestQueueName = requestActor.requestQueueName
+        if requestQueueName == nil {
+            requestQueueName = queueName
+        }
+        
+        guard var requestQueue = requestQueues[requestQueueName!] else {
+            print("===== warning: requestQueue is nil")
+            return
+        }
+        
+        if requestQueue.count == 0 {
+            print("===== warning: request queue \"\(requestQueueName!) is empty.\"")
+        } else {
+            if requestQueue[0] === requestActor {
+                requestQueue.remove(at: 0)
+                
+                if requestQueue.count != 0 {
+                    let nextRequest = requestQueue[0]
+                    let nextRequestOptions = nextRequest.storedOptions
+                    nextRequest.storedOptions = nil
+                    
+                    if !nextRequest.isCancelled {
+                        nextRequest.execute(options: nextRequestOptions)
+                    }
+                } else {
+                    requestQueues.removeValue(forKey: requestQueueName!)
+                }
+            } else {
+                if requestQueue.contains(object: requestActor) {
+                    requestQueue.remove(object: requestActor)
+                } else {
+                    print("===== warning: request queue \"\(requestQueueName!)\" doesn't contain request to \(requestActor.path)")
+                }
+            }
+        }
+        
+        requestQueues[requestQueueName!] = requestQueue
+    }
+    
+    func cancelRequest(_ path: String) {
+        guard let requestInfo = activeRequests[path] else {
+            print("===== warning: cannot cancel request to \"\(path)\": no active request found")
+            return
+        }
+        
+        activeRequests.removeValue(forKey: path)
+        
+        requestInfo.requestActor.cancel()
+        print("===== cancelled request to \"\(path)\"")
+        
+        guard let requestQueueName = requestInfo.requestActor.requestQueueName else {
+            return
+        }
+        
+        removeRequestAndExecuteNextIn(requestQueueName, requestActor: requestInfo.requestActor)
+    }
+    
+    func actor(_ genericPath: String, path: String) -> SwiftActor? {
+        guard let actorType = registeredActors[genericPath] else { return nil }
+        return actorType.init(path: genericPath)
     }
 }
 

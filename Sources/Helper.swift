@@ -22,3 +22,17 @@ extension Array where Element: AnyObject {
         })
     }
 }
+
+public func DispatchOnMainQueue(_ closure: @escaping () -> Void) {
+    if Thread.isMainThread {
+        closure()
+    } else {
+        DispatchQueue.main.async {
+            closure()
+        }
+    }
+}
+
+public func DispatchAfter(_ delay: TimeInterval, queue: DispatchQueue, closure: @escaping () -> Void) {
+    queue.asyncAfter(deadline: .now()+delay, execute: closure)
+}

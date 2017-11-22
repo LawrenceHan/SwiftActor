@@ -1,5 +1,5 @@
 //
-//  ActorError.swift
+//  Result.swift
 //  SwiftActor
 //
 //  Created by Hanguang on 22/11/2017.
@@ -8,5 +8,7 @@
 
 import Foundation
 
-public enum ActorError: Error {
+public enum Result {
+    case success(Any?)
+    case failure(Error)
 }
