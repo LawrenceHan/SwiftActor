@@ -9,14 +9,11 @@
 import UIKit
 import SwiftActor
 
-class ViewController: BaseViewController, Watcher {
-    var handler: Handler?
+class ViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
         Actor.register(TestActor.self)
-        
-        handler = Handler(self)
         Actor.watch("/alert", watcher: self)
     }
 

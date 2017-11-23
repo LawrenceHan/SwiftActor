@@ -7,9 +7,19 @@
 //
 
 import UIKit
+import SwiftActor
 
-class BaseViewController: UIViewController {
+class BaseViewController: UIViewController, Watcher {
+    var handler: Handler?
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        handler = Handler(self)
+    }
+    
     deinit {
+        
+        Actor.remove(watcher: self)
         print("===== \(self) deinited")
     }
 }

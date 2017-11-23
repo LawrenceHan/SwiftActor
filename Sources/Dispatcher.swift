@@ -8,7 +8,6 @@
 
 import Foundation
 import CoreGraphics
-import Result
 
 public final class Dispatcher {
     
@@ -29,7 +28,6 @@ public final class Dispatcher {
     
     private let mainQueue: DispatchQueue!
     private let highPriorityQueue: DispatchQueue!
-    private let networkQueue: DispatchQueue!
     
     // MRAK: - keys
     
@@ -37,7 +35,6 @@ public final class Dispatcher {
     private let mainQueueKey: String!
     private let highPriorityQueueKey: String!
     private let globalQueueKey: String!
-    private let networkQueueKey: String!
     
     // MARK: - locks
     
@@ -57,17 +54,14 @@ public final class Dispatcher {
         mainQueueKey = "com.hanguang.actorqueue"
         highPriorityQueueKey = mainQueueKey+"-high"
         globalQueueKey = mainQueueKey+"-global"
-        networkQueueKey = mainQueueKey+"-network"
         
         mainQueue = DispatchQueue(label: mainQueueKey, qos: .utility, autoreleaseFrequency: .workItem)
         highPriorityQueue = DispatchQueue(label: highPriorityQueueKey, qos: .userInitiated, autoreleaseFrequency: .workItem, target: mainQueue)
         globalQueue = DispatchQueue(label: globalQueueKey, qos: .utility, autoreleaseFrequency: .workItem, target: mainQueue)
-        networkQueue = DispatchQueue(label: networkQueueKey, qos: .utility, autoreleaseFrequency: .workItem, target: mainQueue)
         
         mainQueue.setSpecific(key: queueSpecificKey, value: mainQueueKey)
         highPriorityQueue.setSpecific(key: queueSpecificKey, value: mainQueueKey)
         globalQueue.setSpecific(key: queueSpecificKey, value: mainQueueKey)
-        networkQueue.setSpecific(key: queueSpecificKey, value: mainQueueKey)
     }
     
 }

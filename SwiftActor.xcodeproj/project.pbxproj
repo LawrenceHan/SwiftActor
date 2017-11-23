@@ -26,8 +26,9 @@
 		02D3918D1FC3F96E00B53EE6 /* SwiftActor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02D391861FC3F96D00B53EE6 /* SwiftActor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02D3918E1FC3F96E00B53EE6 /* Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D391871FC3F96D00B53EE6 /* Handler.swift */; };
 		02D391901FC3F96E00B53EE6 /* Watcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D391891FC3F96D00B53EE6 /* Watcher.swift */; };
-		02D391931FC3F9E900B53EE6 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02D391941FC3F9E900B53EE6 /* Result.framework */; };
 		02D3919D1FC42B0500B53EE6 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D3919C1FC42B0500B53EE6 /* Helper.swift */; };
+		02EF9D381FC5716C0073B10B /* SwiftActor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0212AFA81FC28CC000FF1175 /* SwiftActor.framework */; };
+		02EF9D391FC5716C0073B10B /* SwiftActor.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0212AFA81FC28CC000FF1175 /* SwiftActor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +53,13 @@
 			remoteGlobalIDString = 0212AFC51FC28E0D00FF1175;
 			remoteInfo = example;
 		};
+		02EF9D3A1FC5716C0073B10B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0212AF9F1FC28CC000FF1175 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0212AFA71FC28CC000FF1175;
+			remoteInfo = SwiftActor;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -61,6 +69,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				02EF9D391FC5716C0073B10B /* SwiftActor.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -105,7 +114,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				02D391931FC3F9E900B53EE6 /* Result.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02EF9D381FC5716C0073B10B /* SwiftActor.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +304,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				02EF9D3B1FC5716C0073B10B /* PBXTargetDependency */,
 			);
 			name = example;
 			productName = example;
@@ -503,6 +513,11 @@
 			isa = PBXTargetDependency;
 			target = 0212AFC51FC28E0D00FF1175 /* example */;
 			targetProxy = 0212AFE51FC28E0D00FF1175 /* PBXContainerItemProxy */;
+		};
+		02EF9D3B1FC5716C0073B10B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0212AFA71FC28CC000FF1175 /* SwiftActor */;
+			targetProxy = 02EF9D3A1FC5716C0073B10B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -715,8 +730,10 @@
 		0212AFEC1FC28E0D00FF1175 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2L4985KKX7;
 				INFOPLIST_FILE = example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -730,8 +747,10 @@
 		0212AFED1FC28E0D00FF1175 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2L4985KKX7;
 				INFOPLIST_FILE = example/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
