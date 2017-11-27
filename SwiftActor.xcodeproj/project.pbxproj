@@ -22,7 +22,7 @@
 		02AA11E31FC558B00038D86C /* ActorError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AA11E21FC558B00038D86C /* ActorError.swift */; };
 		02AA11E51FC55D2A0038D86C /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02AA11E41FC55D2A0038D86C /* BaseViewController.swift */; };
 		02D3918B1FC3F96E00B53EE6 /* Dispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D391841FC3F96D00B53EE6 /* Dispatcher.swift */; };
-		02D3918C1FC3F96E00B53EE6 /* SwiftActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D391851FC3F96D00B53EE6 /* SwiftActor.swift */; };
+		02D3918C1FC3F96E00B53EE6 /* Actor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D391851FC3F96D00B53EE6 /* Actor.swift */; };
 		02D3918D1FC3F96E00B53EE6 /* SwiftActor.h in Headers */ = {isa = PBXBuildFile; fileRef = 02D391861FC3F96D00B53EE6 /* SwiftActor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		02D3918E1FC3F96E00B53EE6 /* Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D391871FC3F96D00B53EE6 /* Handler.swift */; };
 		02D391901FC3F96E00B53EE6 /* Watcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D391891FC3F96D00B53EE6 /* Watcher.swift */; };
@@ -100,7 +100,7 @@
 		02AA11E21FC558B00038D86C /* ActorError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActorError.swift; sourceTree = "<group>"; };
 		02AA11E41FC55D2A0038D86C /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
 		02D391841FC3F96D00B53EE6 /* Dispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dispatcher.swift; sourceTree = "<group>"; };
-		02D391851FC3F96D00B53EE6 /* SwiftActor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftActor.swift; sourceTree = "<group>"; };
+		02D391851FC3F96D00B53EE6 /* Actor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Actor.swift; sourceTree = "<group>"; };
 		02D391861FC3F96D00B53EE6 /* SwiftActor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwiftActor.h; sourceTree = "<group>"; };
 		02D391871FC3F96D00B53EE6 /* Handler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Handler.swift; sourceTree = "<group>"; };
 		02D391891FC3F96D00B53EE6 /* Watcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Watcher.swift; sourceTree = "<group>"; };
@@ -222,7 +222,7 @@
 			isa = PBXGroup;
 			children = (
 				02D391841FC3F96D00B53EE6 /* Dispatcher.swift */,
-				02D391851FC3F96D00B53EE6 /* SwiftActor.swift */,
+				02D391851FC3F96D00B53EE6 /* Actor.swift */,
 				02D391861FC3F96D00B53EE6 /* SwiftActor.h */,
 				02D391871FC3F96D00B53EE6 /* Handler.swift */,
 				02AA11DF1FC556710038D86C /* Result.swift */,
@@ -455,7 +455,7 @@
 				02D391901FC3F96E00B53EE6 /* Watcher.swift in Sources */,
 				02AA11E01FC556710038D86C /* Result.swift in Sources */,
 				02AA11E31FC558B00038D86C /* ActorError.swift in Sources */,
-				02D3918C1FC3F96E00B53EE6 /* SwiftActor.swift in Sources */,
+				02D3918C1FC3F96E00B53EE6 /* Actor.swift in Sources */,
 				02D3919D1FC42B0500B53EE6 /* Helper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

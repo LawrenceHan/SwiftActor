@@ -1,6 +1,6 @@
 //
-//  SwiftActor.swift
-//  SwiftActor
+//  Actor.swift
+//  Actor
 //
 //  Created by Hanguang on 20/11/2017.
 //  Copyright © 2017 Hanguang. All rights reserved.
@@ -9,9 +9,9 @@
 import Foundation
 
 /// Abstract Class
-open class SwiftActor {
+open class Actor {
     open class var genericPath: String {
-        fatalError("===== error: SwiftActor.genericPath: no default implementation provided.")
+        fatalError("===== error: Actor.genericPath: no default implementation provided.")
     }
     
     open let path: String

@@ -9,4 +9,5 @@
 import Foundation
 
 public enum ActorError: Error {
+    case optionNilError
 }

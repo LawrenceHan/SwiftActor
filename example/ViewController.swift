@@ -10,15 +10,22 @@ import UIKit
 import SwiftActor
 
 class ViewController: BaseViewController {
+//    var handler: Handler?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        Actor.register(TestActor.self)
-        Actor.watch("/alert", watcher: self)
+//        handler = Handler(self)
+        ActorDispatcher.register(TestActor.self)
+        ActorDispatcher.watch("/alert", watcher: self)
     }
 
+    deinit {
+        handler?.reset()
+        ActorDispatcher.remove(watcher: self)
+    }
+    
     @IBAction func showLog() {
-        Actor.request("/alert", watcher: self)
+        ActorDispatcher.request("/alert", watcher: self)
     }
     
     @IBAction func showTestVC() {
@@ -27,7 +34,7 @@ class ViewController: BaseViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     
-    func resourceDispatched(_ path: String, resource: Any, arg: Any?) {
+    override func resourceDispatched(_ path: String, resource: Any, arg: Any?) {
         if path == "/alert" {
             DispatchOnMainQueue {
                 print("===== \(String(describing: self)): \(String(describing: resource))")

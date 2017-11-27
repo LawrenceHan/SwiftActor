@@ -14,7 +14,7 @@ public protocol Watcher: class {
     
     func reportedProgress(_ path: String, progress: CGFloat)
     func resourceDispatched(_ path: String, resource: Any, arg: Any?)
-    func completed(_ path: String, result: Result)
+    func completed(_ path: String, result: SwiftActor.Result)
     func requested(_ action: String, options: [String: Any]?)
     
     func watcherMessageReceived(_ path: String, messageType: String?, message: Any?)
@@ -24,7 +24,7 @@ public protocol Watcher: class {
 public extension Watcher {
     func reportedProgress(_ path: String, progress: CGFloat) {}
     func resourceDispatched(_ path: String, resource: Any, arg: Any?) {}
-    func completed(_ path: String, result: Result) {}
+    func completed(_ path: String, result: SwiftActor.Result) {}
     func requested(_ action: String, options: [String : Any]?) {}
     func watcherMessageReceived(_ path: String, messageType: String?, message: Any?) {}
     func actorMessageReceived(_ path: String, messageType: String?, message: Any?) {}

@@ -13,7 +13,7 @@ public final class Dispatcher {
     
     // MARK: - typealias
     
-    typealias RequestInfo = (requestActor: SwiftActor, watchers: [Handler])
+    typealias RequestInfo = (requestActor: Actor, watchers: [Handler])
     typealias RemoveWatcherInfo = (watcher: Handler, path: String)
     
     // MARK: - constants
@@ -45,7 +45,7 @@ public final class Dispatcher {
     
     private var removeWatcherRequests: [Handler] = []
     private var removeWatcherFromPathRequests: [RemoveWatcherInfo] = []
-    private var requestQueues: [String: [SwiftActor]] = [:]
+    private var requestQueues: [String: [Actor]] = [:]
     private var activeRequests: [String: RequestInfo] = [:]
     private var liveWatchers: [String: [Handler]] = [:]
     
@@ -69,7 +69,7 @@ public final class Dispatcher {
 // MARK: - registration
 
 public extension Dispatcher {
-    public func register(_ actor: SwiftActor.Type) {
+    public func register(_ actor: Actor.Type) {
         registeredActors[actor.genericPath] = actor
     }
 }
@@ -369,7 +369,7 @@ public extension Dispatcher {
         dispatch(workItem)
     }
     
-    public func completed(_ path: String, result: Result) {
+    public func completed(_ path: String, result: SwiftActor.Result) {
         let workItem = DispatchWorkItem { [unowned self] in
             guard let requestInfo = self.activeRequests[path] else {
                 return
@@ -470,13 +470,13 @@ public extension Dispatcher {
         return result
     }
     
-    public func executingActors(pathPrefix: String) -> [SwiftActor] {
+    public func executingActors(pathPrefix: String) -> [Actor] {
         if !isActorQueue {
             print("===== warning: should be called from actor queue")
             return []
         }
         
-        var array: [SwiftActor] = []
+        var array: [Actor] = []
         for (path, requestInfo) in activeRequests {
             if path.hasPrefix(pathPrefix) {
                 array.append(requestInfo.requestActor)
@@ -486,7 +486,7 @@ public extension Dispatcher {
         return array
     }
     
-    public func executingActor(path: String) -> SwiftActor? {
+    public func executingActor(path: String) -> Actor? {
         if !isActorQueue {
             print("===== warning: should be called from actor queue")
             return nil
@@ -640,7 +640,7 @@ private extension Dispatcher {
         }
     }
     
-    func removeRequestAndExecuteNextIn(_ queueName: String, requestActor: SwiftActor) {
+    func removeRequestAndExecuteNextIn(_ queueName: String, requestActor: Actor) {
         var requestQueueName = requestActor.requestQueueName
         if requestQueueName == nil {
             requestQueueName = queueName
@@ -698,15 +698,15 @@ private extension Dispatcher {
         removeRequestAndExecuteNextIn(requestQueueName, requestActor: requestInfo.requestActor)
     }
     
-    func actor(_ genericPath: String, path: String) -> SwiftActor? {
+    func actor(_ genericPath: String, path: String) -> Actor? {
         guard let actorType = registeredActors[genericPath] else { return nil }
         return actorType.init(path: genericPath)
     }
 }
 
 
-private var registeredActors: [String: SwiftActor.Type] = [:]
+private var registeredActors: [String: Actor.Type] = [:]
 
 // MARK: - default shared instance
 
-public let Actor = Dispatcher.default
+public let ActorDispatcher = Dispatcher.default

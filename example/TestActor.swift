@@ -8,13 +8,13 @@
 
 import SwiftActor
 
-class TestActor: SwiftActor {
+class TestActor: Actor {
     override class var genericPath: String {
         return "/alert"
     }
     
     override func execute(options: [String : Any]?) {
-        Actor.dispatch(path, resource: "Good")
-        Actor.completed(path, result: .success(nil))
+        ActorDispatcher.dispatch(path, resource: "Good")
+        ActorDispatcher.completed(path, result: .success(nil))
     }
 }

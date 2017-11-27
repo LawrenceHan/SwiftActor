@@ -13,14 +13,14 @@ class TestViewController: BaseViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        Actor.watch("/alert", watcher: self)
+        ActorDispatcher.watch("/alert", watcher: self)
     }
     
     @IBAction func showLog() {
-        Actor.request("/alert", watcher: self)
+        ActorDispatcher.request("/alert", watcher: self)
     }
     
-    func resourceDispatched(_ path: String, resource: Any, arg: Any?) {
+    override func resourceDispatched(_ path: String, resource: Any, arg: Any?) {
         if path == "/alert" {
             DispatchOnMainQueue {
                 print("===== \(String(describing: self)): \(String(describing: resource))")
